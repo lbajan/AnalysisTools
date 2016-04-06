@@ -7,8 +7,8 @@ if __name__== '__main__':
 	# Input 
 	# --------------------------------------------------------------------------------------------------------------------------------
 
-	fileInput = ROOT.TFile('CMSSW_7_4_15/src/CMSDIJET/DijetRootTreeAnalyzer/output/rootFile_reduced_skim.root')
-        #fileInput = ROOT.TFile.Open('root://eoscms.cern.ch//eos/cms/store/group/phys_exotica/dijet/Dijet13TeVScouting/rootTrees_reduced/ParkingScoutingMonitor-02-02-2016_20160202_191206/rootfile_ParkingScoutingMonitor_Run2015D-PromptReco-v4_JEC_HLT_v7_LowerCuts_20160304_reduced_skim.root')
+	#fileInput = ROOT.TFile('CMSSW_7_4_15/src/CMSDIJET/DijetRootTreeAnalyzer/output/rootFile_reduced_skim.root')
+        fileInput = ROOT.TFile.Open('root://eoscms.cern.ch//eos/cms/store/group/phys_exotica/dijet/Dijet13TeVScouting/rootTrees_reduced/ParkingScoutingMonitor-02-02-2016_20160202_191206/rootfile_ParkingScoutingMonitor_Run2015D-PromptReco-v4_JEC_HLT_v7_LowerCuts_20160304_reduced_skim.root')
 
 	tree = fileInput.Get( 'rootTupleTree/tree' )
 	nEntries = tree.GetEntriesFast()
