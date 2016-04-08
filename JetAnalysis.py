@@ -1,14 +1,24 @@
 # coding: utf-8
 import ROOT
-
+import sys
+from optparse import OptionParser
+ 
 if __name__== '__main__':
-
-	# --------------------------------------------------------------------------------------------------------------------------------
+  	# --------------------------------------------------------------------------------------------------------------------------------
 	# Input 
 	# --------------------------------------------------------------------------------------------------------------------------------
-
-	#fileInput = ROOT.TFile('CMSSW_7_4_15/src/CMSDIJET/DijetRootTreeAnalyzer/output/rootFile_reduced_skim.root')
+	#fileInput = ROOT.TFile('/afs/cern.ch/user/l/lbajan/CMSSW_7_4_15/src/CMSDIJET/DijetRootTreeAnalyzer/output/rootFile_reduced_skim.root')
         fileInput = ROOT.TFile.Open('root://eoscms.cern.ch//eos/cms/store/group/phys_exotica/dijet/Dijet13TeVScouting/rootTrees_reduced/ParkingScoutingMonitor-02-02-2016_20160202_191206/rootfile_ParkingScoutingMonitor_Run2015D-PromptReco-v4_JEC_HLT_v7_LowerCuts_20160304_reduced_skim.root')
+
+        parser = OptionParser() 
+
+        parser.add_option('--maxevents', type='int', action='store',
+               default=-1,
+               dest='maxevents',
+               help='Number of events to run. -1 is all events')
+
+        (options, args) = parser.parse_args()
+        print options,args
 
 	tree = fileInput.Get( 'rootTupleTree/tree' )
 	nEntries = tree.GetEntriesFast()
@@ -34,11 +44,19 @@ if __name__== '__main__':
 	# --------------------------------------------------------------------------------------------------------------------------------
 	# Main loop
 	# --------------------------------------------------------------------------------------------------------------------------------
+        
         j=0
 	for i in xrange(nEntries):
 
-		# Get event informations
-		tree.GetEntry(i)
+	        # Get event informations
+	        tree.GetEntry(i)
+
+                if options.maxevents > 0 and i > options.maxevents :
+                   break              
+  
+                if i % 1000 == 0 : 
+                    print '---> Event ' + str(i) 
+                  
                 #HLT jets
                 jets=[]   #empty list for HLT jets
                 jet1=ROOT.TLorentzVector() #initialize Lorentz vector components for HLT jet1
@@ -95,7 +113,7 @@ if __name__== '__main__':
                 CSVHLTvspT2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_j2)
                 CSVRECOvspT2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_recoj2)
 
-
+              
                
         print "IdxMatching[0] is negative %d times. " %j 
         print "Correlation factor for HLT CSV and RECO CSV for 1st leading jet is:", histogram.GetCorrelationFactor() 
@@ -144,7 +162,7 @@ if __name__== '__main__':
         nybins=histogram.GetNbinsY()
         i=0
         while i <= nxbins:
-              htemp=histogram.ProjectionY('y',i,i)
+              htemp=normalize.ProjectionY('y',i,i)
               e = ROOT.TCanvas( 'test', 'test', 1200, 1000)
 	      e.cd()
               #histogram.Draw('LEGO2Z')
@@ -294,7 +312,10 @@ if __name__== '__main__':
 
         #Normalization of HLT vs RECO CSV plot 
         s = ROOT.TCanvas( 'test', 'test', 1200, 1000)
+#        ROOT.gStyle.SetCanvasDefH(1500)
+#        ROOT.gStyle.SetCanvasDefW(1500)
         s.cd()
+        s.SetRightMargin(0.13)
         #histogram.Draw('LEGO2Z')
         normalize.Draw('colztext') # "colz"
         #normalize.SetTitle('NORMALIZED HLT VS RECO CSV PLOT')
