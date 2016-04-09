@@ -17,6 +17,12 @@ if __name__== '__main__':
                dest='maxevents',
                help='Number of events to run. -1 is all events')
 
+        parser.add_option('--print_every', type='int', action='store',
+               default=1000,
+               dest='print_every',
+               help='Print every nth event that is processed . -1 is all events')
+
+
         (options, args) = parser.parse_args()
         print options,args
 
@@ -54,9 +60,37 @@ if __name__== '__main__':
                 if options.maxevents > 0 and i > options.maxevents :
                    break              
   
-                if i % 1000 == 0 : 
+                if i % options.print_every == 0 : 
                     print '---> Event ' + str(i) 
-                  
+#                if not tree.passHLT_CaloJet40 >0: 
+#                    continue 
+                if not tree.pTAK4_j1 > 60 :
+                   continue
+                if not tree.pTAK4_j2 > 30 :
+                   continue
+                if not tree.pTAK4_recoj1 > 60 :
+                   continue
+                if not tree.pTAK4_recoj2 > 30 :
+                   continue
+                if not abs(tree.etaAK4_j1) < 2.5 :
+                   continue
+                if not abs(tree.etaAK4_j2) < 2.5 :
+                   continue
+                if not abs(tree.etaAK4_recoj1) < 2.5 :
+                   continue
+                if not abs(tree.etaAK4_recoj2) < 2.5 :
+                   continue
+#                if not tree.deltaETAjj < 1.3 :
+#                   break
+#                if tree.deltaETAjjreco > 1.3 : #treba li za reco?
+#                   break
+#                if tree.mjj < 500 :
+#                   break
+#                if tree.mjjreco < 500 :
+#                   break
+
+
+
                 #HLT jets
                 jets=[]   #empty list for HLT jets
                 jet1=ROOT.TLorentzVector() #initialize Lorentz vector components for HLT jet1
