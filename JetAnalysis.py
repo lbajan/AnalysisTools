@@ -51,7 +51,9 @@ if __name__== '__main__':
 	# Main loop
 	# --------------------------------------------------------------------------------------------------------------------------------
         
-        j=0
+        j=0 
+        k=0 
+        p=0
 	for i in xrange(nEntries):
 
 	        # Get event informations
@@ -64,6 +66,7 @@ if __name__== '__main__':
                     print '---> Event ' + str(i) 
 #                if not tree.passHLT_CaloJet40 >0: 
 #                    continue 
+                #applie cuts on pT, eta, delta eta and mjj
                 if not tree.pTAK4_j1 > 60 :
                    continue
                 if not tree.pTAK4_j2 > 30 :
@@ -111,6 +114,31 @@ if __name__== '__main__':
                 jets_Reco.append(jet2_Reco) #append RECO jet2 to list jets
                 CSV_reco=[tree.jetCSVAK4_recoj1,tree.jetCSVAK4_recoj2] #create list with CSV for each jet                
 
+                #checking if jet 1/2 is selected. If not, break!
+                JetsSelection=[]
+
+                if not CSV[0] or CSV_reco[0]:
+                   JetsSelection.append(1)
+                   JetsSelection.append(1)                               
+                 
+                else: 
+                   JetsSelection.append(-1)
+                   JetsSelection.append(1)         
+                   k+=1 
+               
+                if not CSV[1] or CSV_reco[1]:
+                   JetsSelection.append(1)
+                   JetsSelection.append(1)
+                      
+            
+                else: 
+                   JetsSelection.append(1)
+                   JetsSelection.append(-1)
+                   p+=1 
+                if not JetsSelection[0]>0 and JetsSelection[1]>0 :
+                   continue            
+ 
+
                 #distance between HLT and RECO jets
                 DeltaReco1HLT1=jets_Reco[0].DeltaR(jets[0])
                 DeltaReco1HLT2=jets_Reco[1].DeltaR(jets[1])
@@ -150,6 +178,8 @@ if __name__== '__main__':
               
                
         print "IdxMatching[0] is negative %d times. " %j 
+        print 'Jet 1 is not selected %d times.' %k 
+        print 'Jet 2 is not selected %d times.' %p
         print "Correlation factor for HLT CSV and RECO CSV for 1st leading jet is:", histogram.GetCorrelationFactor() 
         print "Correlation factor for HLT CSV and RECO CSV for 2nd leading jet is:", histogram_j2.GetCorrelationFactor()
         print "Correlation factor for pT RECO and HLT for 1st leading jet is:", pthisto.GetCorrelationFactor() 
