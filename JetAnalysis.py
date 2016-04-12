@@ -63,35 +63,38 @@ if __name__== '__main__':
                    break              
   
                 if i % options.print_every == 0 : 
-                    print '---> Event ' + str(i) 
-#                if not tree.passHLT_CaloJet40 >0: 
-#                    continue 
+                    print '---> Event ' + str(i)
+                    print 'Selected events:', k 
+                    print 'Run:', tree.run
+             
+                if not tree.passHLT_HT450 >0: 
+                    continue 
                 #applie cuts on pT, eta, delta eta and mjj
                 if not tree.pTAK4_j1 > 60 :
                    continue
                 if not tree.pTAK4_j2 > 30 :
                    continue
-                if not tree.pTAK4_recoj1 > 60 :
+#                if not tree.pTAK4_recoj1 > 60 :
+#                   continue
+#                if not tree.pTAK4_recoj2 > 30 :
+#                   continue
+                if not abs(tree.etaAK4_j1) < 2.4 :
                    continue
-                if not tree.pTAK4_recoj2 > 30 :
+                if not abs(tree.etaAK4_j2) < 2.4 :
                    continue
-                if not abs(tree.etaAK4_j1) < 2.5 :
-                   continue
-                if not abs(tree.etaAK4_j2) < 2.5 :
-                   continue
-                if not abs(tree.etaAK4_recoj1) < 2.5 :
-                   continue
-                if not abs(tree.etaAK4_recoj2) < 2.5 :
-                   continue
+#                if not abs(tree.etaAK4_recoj1) < 2.5 :
+#                   continue
+#                if not abs(tree.etaAK4_recoj2) < 2.5 :
+#                   continue
 #                if not tree.deltaETAjj < 1.3 :
 #                   break
 #                if tree.deltaETAjjreco > 1.3 : #treba li za reco?
 #                   break
-#                if tree.mjj < 500 :
-#                   break
-#                if tree.mjjreco < 500 :
-#                   break
-
+#                if tree.mjj > 500 :
+#                   continue
+#                if tree.mjjreco > 500 :
+#                   continue
+                k+=1
 
 
                 #HLT jets
@@ -115,29 +118,29 @@ if __name__== '__main__':
                 CSV_reco=[tree.jetCSVAK4_recoj1,tree.jetCSVAK4_recoj2] #create list with CSV for each jet                
 
                 #checking if jet 1/2 is selected. If not, break!
-                JetsSelection=[]
+#                JetsSelection=[]
 
-                if not CSV[0] or CSV_reco[0]:
-                   JetsSelection.append(1)
-                   JetsSelection.append(1)                               
-                 
-                else: 
-                   JetsSelection.append(-1)
-                   JetsSelection.append(1)         
-                   k+=1 
-               
-                if not CSV[1] or CSV_reco[1]:
-                   JetsSelection.append(1)
-                   JetsSelection.append(1)
-                      
-            
-                else: 
-                   JetsSelection.append(1)
-                   JetsSelection.append(-1)
-                   p+=1 
-                if not JetsSelection[0]>0 and JetsSelection[1]>0 :
-                   continue            
- 
+#                if not CSV[0] or CSV_reco[0]:
+#                   JetsSelection.append(1)
+#                   JetsSelection.append(1)                               
+#                 
+#                else: 
+#                   JetsSelection.append(-1)
+#                   JetsSelection.append(1)         
+#                   k+=1 
+#               
+#                if not CSV[1] or CSV_reco[1]:
+#                   JetsSelection.append(1)
+#                   JetsSelection.append(1)
+#                      
+#            
+#                else: 
+#                   JetsSelection.append(1)
+#                   JetsSelection.append(-1)
+#                   p+=1 
+#                if not JetsSelection[0]>0 and JetsSelection[1]>0 :
+#                   continue            
+# 
 
                 #distance between HLT and RECO jets
                 DeltaReco1HLT1=jets_Reco[0].DeltaR(jets[0])
@@ -178,8 +181,8 @@ if __name__== '__main__':
               
                
         print "IdxMatching[0] is negative %d times. " %j 
-        print 'Jet 1 is not selected %d times.' %k 
-        print 'Jet 2 is not selected %d times.' %p
+#        print 'Jet 1 is not selected %d times.' %k 
+#        print 'Jet 2 is not selected %d times.' %p
         print "Correlation factor for HLT CSV and RECO CSV for 1st leading jet is:", histogram.GetCorrelationFactor() 
         print "Correlation factor for HLT CSV and RECO CSV for 2nd leading jet is:", histogram_j2.GetCorrelationFactor()
         print "Correlation factor for pT RECO and HLT for 1st leading jet is:", pthisto.GetCorrelationFactor() 
@@ -399,6 +402,12 @@ if __name__== '__main__':
 	outFile =ROOT.TFile('CSV_HLT_vs_pT_jet1.root', 'recreate')
         #outFile.cd()
         CSVHLTvspT1.Write()
+        outFile.Close()
+
+        #Create ROOT file
+	outFile =ROOT.TFile('Normalization.root', 'recreate')
+        #outFile.cd()
+        normalize.Write()
         outFile.Close()
 
         #Create ROOT file
