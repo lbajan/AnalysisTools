@@ -42,13 +42,13 @@ if options.operating_point == 'loose': operatingPoint = 0.605 # CSVv2IVFL
 if options.operating_point == 'tight': operatingPoint = 0.97 # CSVv2IVFT
 
 # input files
-inputFile_ttbar = TFile.Open('CSV_HLT_vs_pT_jet1.root')
-inputFile_QCD   = TFile.Open('CSV_RECO_vs_pT_jet1.root')
+inputFile_ttbar = TFile.Open('output.root')
+inputFile_QCD   = TFile.Open('output.root')
 
 
 # get 2D b-tag discriminator vs jet pT histograms
-discrVsPt_b_ttbar    = inputFile_ttbar.Get('id8')
-discrVsPt_b_QCD      = inputFile_QCD.Get('id9')
+discrVsPt_b_ttbar    = inputFile_ttbar.Get('firs_range_jet1')
+discrVsPt_b_QCD      = inputFile_QCD.Get('firs_range_jet1_reco')
 #discrVsPt_udsg_ttbar = inputFile_ttbar.Get('id9')
 #discrVsPt_udsg_QCD   = inputFile_QCD.Get('bTaggingExerciseII/' + bTagger + '_udsg')
 
@@ -80,10 +80,10 @@ c.cd()
 
 # b jets
 eff_b_ttbar = TGraphAsymmErrors(tagged_b_ttbar, total_b_ttbar, "cp")
-eff_b_ttbar.GetXaxis().SetTitle("Jet p_{T} [GeV]")
+eff_b_ttbar.GetXaxis().SetTitle("Jet pT [GeV]")
 eff_b_ttbar.GetYaxis().SetTitle("b-tagging efficiency")
-eff_b_ttbar.GetXaxis().SetRangeUser(0.,900.)
-eff_b_ttbar.GetYaxis().SetRangeUser(0.,1.)
+eff_b_ttbar.GetXaxis().SetRangeUser(0,900)
+eff_b_ttbar.GetYaxis().SetRangeUser(0.,0.4)
 eff_b_ttbar.SetLineWidth(2)
 eff_b_ttbar.SetLineColor(kRed)
 eff_b_ttbar.SetMarkerColor(kRed)
@@ -108,7 +108,7 @@ legend.AddEntry(eff_b_QCD,"RECO","lp")
 legend.Draw()
 
 # save the plot
-if options.operating_point == 'loose': c.SaveAs('bTaggingEfficiency_pfCSVv2IVFL.pdf')
+if options.operating_point == 'loose': c.SaveAs('bTaggingEfficiency_first_range_eta.pdf')
 elif options.operating_point == 'tight': c.SaveAs('bTaggingEfficiency_pfCSVv2IVFT.pdf')
 else: c.SaveAs('bTaggingEfficiency_pfCSVv2IVFM_JET1.pdf')
 

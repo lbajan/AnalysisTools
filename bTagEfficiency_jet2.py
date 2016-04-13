@@ -42,8 +42,8 @@ if options.operating_point == 'loose': operatingPoint = 0.605 # CSVv2IVFL
 if options.operating_point == 'tight': operatingPoint = 0.97 # CSVv2IVFT
 
 # input files
-inputFile_ttbar = TFile.Open('CSV_HLT_vs_pT_jet2.root')
-inputFile_QCD   = TFile.Open('CSV_RECO_vs_pT_jet2.root')
+inputFile_ttbar = TFile.Open('output.root')
+inputFile_QCD   = TFile.Open('output.root')
 
 
 # get 2D b-tag discriminator vs jet pT histograms
@@ -80,10 +80,10 @@ c.cd()
 
 # b jets
 eff_b_ttbar = TGraphAsymmErrors(tagged_b_ttbar, total_b_ttbar, "cp")
-eff_b_ttbar.GetXaxis().SetTitle("Jet p_{T} [GeV]")
+eff_b_ttbar.GetXaxis().SetTitle("Jet pT [GeV]")
 eff_b_ttbar.GetYaxis().SetTitle("b-tagging efficiency")
-eff_b_ttbar.GetXaxis().SetRangeUser(0.,900.)
-eff_b_ttbar.GetYaxis().SetRangeUser(0.,1.)
+eff_b_ttbar.GetXaxis().SetRangeUser(0,900)
+eff_b_ttbar.GetYaxis().SetRangeUser(0.,0.4)
 eff_b_ttbar.SetLineWidth(2)
 eff_b_ttbar.SetLineColor(kRed)
 eff_b_ttbar.SetMarkerColor(kRed)

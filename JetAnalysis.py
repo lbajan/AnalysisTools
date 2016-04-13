@@ -43,6 +43,31 @@ if __name__== '__main__':
         CSVRECOvspT1=ROOT.TH2F("id9","RECO CSV vs pT JET1",50,0,900,50,0,1.2)
         CSVHLTvspT2=ROOT.TH2F("eff_jet2","HLT CSV vs pT JET2",50,0,900,50,0,1.2)
         CSVRECOvspT2=ROOT.TH2F("eff_reco_jet2","RECO CSV vs pT JET2",50,0,900,50,0,1.2)
+        CSVHLTvseta1=ROOT.TH2F('csv_vs_eta_jet1', 'HLT CSV vs eta jet1', 50,-2.5,2.5,50,0,1.2)
+        CSVRECOvseta1=ROOT.TH2F('csvreco_vs_eta_jet1', 'RECO CSV vs eta jet1', 50,-2.5,2.5,50,0,1.2)
+        CSVHLTvseta2=ROOT.TH2F('csv_vs_eta_jet2', 'HLT CSV vs eta jet2', 50,-2.5,2.5,50,0,1.2)
+        CSVRECOvseta2=ROOT.TH2F('csvreco_vs_eta_jet2', 'RECO CSV vs eta jet2', 50,-2.5,2.5,50,0,1.2)
+
+        first_range_jet1= ROOT.TH2F("firs_range_jet1",'',50,0,900,50,0,1.2)
+        second_range_jet1= ROOT.TH2F("second_range_jet1",'',50,0,900,50,0,1.2)
+        third_range_jet1= ROOT.TH2F("third_range_jet1",'',50,0,900,50,0,1.2)
+        fourth_range_jet1= ROOT.TH2F("fourth_range_jet1",'',50,0,900,50,0,1.2)
+        first_range_jet2= ROOT.TH2F("firs_range_jet2",'',50,0,900,50,0,1.2)
+        second_range_jet2= ROOT.TH2F("second_range_jet2",'',50,0,900,50,0,1.2)
+        third_range_jet2= ROOT.TH2F("third_range_jet2",'',50,0,900,50,0,1.2)
+        fourth_range_jet2= ROOT.TH2F("fourth_range_jet2",'',50,0,900,50,0,1.2)
+
+        first_range_jet1_reco= ROOT.TH2F("firs_range_jet1_reco",'',50,0,900,50,0,1.2)
+        second_range_jet1_reco= ROOT.TH2F("second_range_jet1_reco",'',50,0,900,50,0,1.2)
+        third_range_jet1_reco= ROOT.TH2F("third_range_jet1_reco",'',50,0,900,50,0,1.2)
+        fourth_range_jet1_reco= ROOT.TH2F("fourth_range_jet1_reco",'',50,0,900,50,0,1.2)
+        first_range_jet2_reco= ROOT.TH2F("firs_range_jet2_reco",'',50,0,900,50,0,1.2)
+        second_range_jet2_reco= ROOT.TH2F("second_range_jet2_reco",'',50,0,900,50,0,1.2)
+        third_range_jet2_reco= ROOT.TH2F("third_range_jet2_reco",'',50,0,900,50,0,1.2)
+        fourth_range_jet2_reco= ROOT.TH2F("fourth_range_jet2_reco",'',50,0,900,50,0,1.2)
+
+
+
 
   
 	print 'Number of entries: ', nEntries
@@ -74,26 +99,10 @@ if __name__== '__main__':
                    continue
                 if not tree.pTAK4_j2 > 30 :
                    continue
-#                if not tree.pTAK4_recoj1 > 60 :
-#                   continue
-#                if not tree.pTAK4_recoj2 > 30 :
-#                   continue
                 if not abs(tree.etaAK4_j1) < 2.4 :
                    continue
                 if not abs(tree.etaAK4_j2) < 2.4 :
                    continue
-#                if not abs(tree.etaAK4_recoj1) < 2.5 :
-#                   continue
-#                if not abs(tree.etaAK4_recoj2) < 2.5 :
-#                   continue
-#                if not tree.deltaETAjj < 1.3 :
-#                   break
-#                if tree.deltaETAjjreco > 1.3 : #treba li za reco?
-#                   break
-#                if tree.mjj > 500 :
-#                   continue
-#                if tree.mjjreco > 500 :
-#                   continue
                 k+=1
 
 
@@ -115,32 +124,7 @@ if __name__== '__main__':
                 jet2_Reco.SetPtEtaPhiM(tree.pTAK4_recoj2,tree.etaAK4_recoj2,tree.phiAK4_recoj2,tree.massAK4_recoj2) #set values
 	        jets_Reco.append(jet1_Reco) #append RECO jet1 to list jets 
                 jets_Reco.append(jet2_Reco) #append RECO jet2 to list jets
-                CSV_reco=[tree.jetCSVAK4_recoj1,tree.jetCSVAK4_recoj2] #create list with CSV for each jet                
-
-                #checking if jet 1/2 is selected. If not, break!
-#                JetsSelection=[]
-
-#                if not CSV[0] or CSV_reco[0]:
-#                   JetsSelection.append(1)
-#                   JetsSelection.append(1)                               
-#                 
-#                else: 
-#                   JetsSelection.append(-1)
-#                   JetsSelection.append(1)         
-#                   k+=1 
-#               
-#                if not CSV[1] or CSV_reco[1]:
-#                   JetsSelection.append(1)
-#                   JetsSelection.append(1)
-#                      
-#            
-#                else: 
-#                   JetsSelection.append(1)
-#                   JetsSelection.append(-1)
-#                   p+=1 
-#                if not JetsSelection[0]>0 and JetsSelection[1]>0 :
-#                   continue            
-# 
+                CSV_reco=[tree.jetCSVAK4_recoj1,tree.jetCSVAK4_recoj2] #create list with CSV for each jet                 
 
                 #distance between HLT and RECO jets
                 DeltaReco1HLT1=jets_Reco[0].DeltaR(jets[0])
@@ -152,35 +136,134 @@ if __name__== '__main__':
                 IdxMatching=[]
                 #if..elif..else statement determins which RECO jet is closer to HLT1 jet
                 #and sets condition on distance 
-                if DeltaReco1HLT1 <= DeltaReco2HLT1 and DeltaReco1HLT1 < 0.2:
-                   IdxMatching.append(0)
-                   IdxMatching.append(1)
-                elif DeltaReco2HLT1 < DeltaReco1HLT1 and DeltaReco2HLT1 < 0.2:
-                   IdxMatching.append(1)
-                   IdxMatching.append(0)
+                if DeltaReco1HLT1 <= DeltaReco2HLT1:
+                   if DeltaReco1HLT1 < 0.2:
+                      IdxMatching.append(0)
+                   else :
+                      IdxMatching.append(-1)
+                   if DeltaReco2HLT2 < 0.2:
+                      IdxMatching.append(1)
+                   else :
+                      IdxMatching.append(-1)
                 else:
-                   IdxMatching.append(-1) #distance between RECO and scouting jet is greater than 0.2
+                   if DeltaReco2HLT1 < 0.2:
+                      IdxMatching.append(1)
+                   else :
+                      IdxMatching.append(-1)
+                   if DeltaReco1HLT2 < 0.2:
+                      IdxMatching.append(0)
+                   else :
+                      IdxMatching.append(-1)
+  
                 if not IdxMatching[0] < 0:
                        CSV_temp = (-0.025 if CSV[0]<0 else CSV[0]) #remapping of negative CSV values for HLT
                        CSV_temp_reco = (-0.025 if CSV_reco[IdxMatching[0]]<0 else CSV_reco[IdxMatching[0]]) #remapping for RECO
-                       CSV_temp_j2 = (-0.025 if CSV[1]<0 else CSV[1])
-                       CSV_temp_reco_j2 = (-0.025 if CSV_reco[IdxMatching[1]]<0 else CSV_reco[IdxMatching[1]])
                        histogram.Fill(CSV_temp,CSV_temp_reco)
-                       histogram_j2.Fill(CSV_temp_j2,CSV_temp_reco_j2)
-   
-      
-                else:
-                       j+=1
-                pthisto.Fill(tree.pTAK4_j1,tree.pTAK4_recoj1) #histogram for determinig correlation factor for 1st leading jet
-                pthisto_j2.Fill(tree.pTAK4_j2,tree.pTAK4_recoj2) #histogram for determining correlation factor for 2nd leading jet
-                CSVHLTvspT1.Fill(tree.pTAK4_j1,tree.jetCSVAK4_j1)
-                CSVRECOvspT1.Fill(tree.pTAK4_j1,tree.jetCSVAK4_recoj1)
-                CSVHLTvspT2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_j2)
-                CSVRECOvspT2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_recoj2)
+                       pthisto.Fill(jets[0].Pt(),jets_Reco[IdxMatching[0]].Pt()) #histogram for determinig correlation factor for leading jet
+                       CSVHLTvspT1.Fill(jets[0].Pt(),CSV_temp)
+                       CSVRECOvspT1.Fill(jets[0].Pt(),CSV_temp_reco)
+                       CSVHLTvseta1.Fill(jets[0].Eta(),CSV_temp)
+                       CSVRECOvseta1.Fill(jets[0].Eta(),CSV_temp_reco)
+
+#                       first_range: [-2.4,-1.2]
+#                       second_range: [-1.2,0]
+#                       third_range: [0,1.2]
+#                       fourth_range: [1.2,2.4]
+                       
+                       eta = jets[0].Eta()
+
+                       if eta >= -2.4 and eta < -1.2:  
+                          first_range_jet1.Fill(jets[0].Pt(),CSV_temp)
+                          first_range_jet1_reco.Fill(jets[0].Pt(),CSV_temp_reco)
+                       elif eta >= -1.2 and eta < 0:
+                          second_range_jet1.Fill(jets[0].Pt(),CSV_temp)
+                          second_range_jet1_reco.Fill(jets[0].Pt(),CSV_temp_reco)
+                       elif eta >=0 and eta < 1.2:
+                          third_range_jet1.Fill(jets[0].Pt(),CSV_temp)
+                          third_range_jet1_reco.Fill(jets[0].Pt(),CSV_temp_reco)
+                       elif eta >= 1.2 and eta < 2.4:
+                          fourth_range_jet1.Fill(jets[0].Pt(),CSV_temp)
+                          fourth_range_jet1_reco.Fill(jets[0].Pt(),CSV_temp_reco)
+                       else:
+                          break
+
+
+                if not IdxMatching[1] < 0:
+                      
+                       CSV_temp = (-0.025 if CSV[1]<0 else CSV[1])
+                       CSV_temp_reco = (-0.025 if CSV_reco[IdxMatching[1]]<0 else CSV_reco[IdxMatching[1]])
+                       histogram_j2.Fill(CSV_temp,CSV_temp_reco)
+                       pthisto_j2.Fill(jets[1].Pt(),jets_Reco[IdxMatching[1]].Pt())  
+                       CSVHLTvspT2.Fill(jets[1].Pt(),CSV_temp)
+                       CSVRECOvspT2.Fill(jets[1].Pt(),CSV_temp_reco) 
+                       CSVHLTvseta2.Fill(jets[1].Eta(),CSV_temp)
+                       CSVRECOvseta2.Fill(jets[1].Eta(),CSV_temp_reco)
+                
+                       eta = jets[1].Eta()
+         
+                       if eta >= -2.4 and eta < -1.2:  
+                         first_range_jet2.Fill(jets[1].Pt(),CSV_temp)
+                         first_range_jet2_reco.Fill(jets[1].Pt(),CSV_temp_reco)
+                       elif eta >= -1.2 and eta < 0:
+                         second_range_jet2.Fill(jets[1].Pt(),CSV_temp)
+                         second_range_jet2_reco.Fill(jets[1].Pt(),CSV_temp_reco)
+                       elif eta >=0 and eta < 1.2:
+                         third_range_jet2.Fill(jets[1].Pt(),CSV_temp)
+                         third_range_jet2_reco.Fill(jets[1].Pt(),CSV_temp_reco)
+                       elif eta >= 1.2 and eta < 2.4:
+                        fourth_range_jet2.Fill(jets[1].Pt(),CSV_temp)
+                        fourth_range_jet2_reco.Fill(jets[1].Pt(),CSV_temp_reco)
+                       else:
+                        break
+                
+
+                       
+
+             
+#                CSVHLTvspT1.Fill(tree.pTAK4_j1,tree.jetCSVAK4_j1)
+#                CSVRECOvspT1.Fill(tree.pTAK4_j1,tree.jetCSVAK4_recoj1)
+#                CSVHLTvspT2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_j2)
+#                CSVRECOvspT2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_recoj2)
+#                CSVHLTvseta1.Fill(tree.etaAK4_j1,tree.jetCSVAK4_j1)
+#                CSVRECOvseta1.Fill(tree.etaAK4_j1,tree.jetCSVAK4_recoj1)
+#                CSVHLTvseta2.Fill(tree.etaAK4_j2,tree.jetCSVAK4_j2)
+#                CSVRECOvseta2.Fill(tree.etaAK4_j2,tree.jetCSVAK4_recoj2)
+             
+#                eta = tree.etaAK4_j1
+#         
+#                if eta >= -2.4 and eta < -1.2:  
+#                   -2.4->-1.2.Fill(tree.pTAK4_j1,tree.jetCSVAK4_j1)
+#                   -2.4->-1.2.Fill(tree.pTAK4_j1,tree.jetCSVAK4_recoj1)
+#                elif eta >= -1.2 and eta < 0:
+#                   -1.2->0.Fill(tree.pTAK4_j1,tree.jetCSVAK4_j1)
+#                   -1.2->0.Fill(tree.pTAK4_j1,tree.jetCSVAK4_recoj1)
+#                elif eta >=0 and eta < 1.2:
+#                    0-> 1.2.Fill(tree.pTAK4_j1,tree.jetCSVAK4_j1)
+#                    0-> 1.2.Fill(tree.pTAK4_j1,tree.jetCSVAK4_recoj1)
+#                else eta >= 1.2 and eta =< 2.4:
+#                    1.2-> 2.4.Fill(tree.pTAk4_j1,tree.jetCSVAK4_j1)
+#                    1.2-> 2.4.Fill(tree.pTAk4_j1,tree.jetCSVAK4_recoj1)
+
+#                eta2 = tree.etaAK4_j2
+         
+#                if eta2 >= -2.4 and eta < -1.2:  
+#                   -2.4->-1.2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_j2)
+#                   -2.4->-1.2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_recoj2)
+#                elif eta2 >= -1.2 and eta < 0:
+#                   -1.2->0.Fill(tree.pTAK4_j2,tree.jetCSVAK4_j2)
+#                   -1.2->0.Fill(tree.pTAK4_j2,tree.jetCSVAK4_recoj2)
+#                elif eta2 >=0 and eta < 1.2:
+#                    0-> 1.2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_j2)
+#                    0-> 1.2.Fill(tree.pTAK4_j2,tree.jetCSVAK4_recoj2)
+#                else eta2 >= 1.2 and eta =< 2.4:
+#                    1.2-> 2.4.Fill(tree.pTAk4_j2,tree.jetCSVAK4_j2)
+#                    1.2-> 2.4.Fill(tree.pTAk4_j2,tree.jetCSVAK4_recoj2)
+#                
+
+
 
               
-               
-        print "IdxMatching[0] is negative %d times. " %j 
+          
 #        print 'Jet 1 is not selected %d times.' %k 
 #        print 'Jet 2 is not selected %d times.' %p
         print "Correlation factor for HLT CSV and RECO CSV for 1st leading jet is:", histogram.GetCorrelationFactor() 
@@ -235,8 +318,10 @@ if __name__== '__main__':
               #histogram.Draw('LEGO2Z')
               htemp.Draw('colz') # "colz"
 	      #histogram.SetTitle(namesTF[i])
+              e.SetLeftMargin(0.17)
 	      htemp.GetXaxis().SetTitle('RECO CSV')
-              htemp.GetYaxis().SetTitle('ENTRIES')			
+              htemp.GetYaxis().SetTitle(' ENTRIES/SUM ENTRIES')	
+              htemp.GetYaxis().SetTitleOffset(1.4)		
 	      #h[i].GetYaxis().SetTitle("SCEta");
               #histogram.GetColorTransparent(55, 0.3)
               #ROOT.gStyle.SetPalette(107)
@@ -287,7 +372,7 @@ if __name__== '__main__':
         projection.Draw() # "colz"
         projection.SetTitle('1D PROJECTION ON THE Y AXIS JET1')
         projection.GetXaxis().SetTitle('RECO CSV')
-        projection.GetYaxis().SetTitle('Entries')
+        projection.GetYaxis().SetTitle('Entries/sum entries')
         #h[i].GetYaxis().SetTitle("SCEta");
         #ROOT.gStyle.SetPalette(29)
         ROOT.gStyle.SetOptStat(0)
@@ -397,39 +482,90 @@ if __name__== '__main__':
         s.SetLogz()
         s.SaveAs('normalization.pdf')
 
+        #Create ROOT file
+        outFile = ROOT.TFile('output.root', 'recreate')
+        
+  
 
 	#Create ROOT file
-	outFile =ROOT.TFile('CSV_HLT_vs_pT_jet1.root', 'recreate')
+#	outFile =ROOT.TFile('CSV_HLT_vs_pT_jet1.root', 'recreate')
         #outFile.cd()
         CSVHLTvspT1.Write()
-        outFile.Close()
+#        outFile.Close()
 
         #Create ROOT file
-	outFile =ROOT.TFile('Normalization.root', 'recreate')
+#	outFile =ROOT.TFile('Normalization.root', 'recreate')
         #outFile.cd()
         normalize.Write()
-        outFile.Close()
+#        outFile.Close()
 
         #Create ROOT file
-        outFile = ROOT.TFile('CSV_RECO_vs_pT_jet1.root', 'recreate')
+#        outFile = ROOT.TFile('CSV_RECO_vs_pT_jet1.root', 'recreate')
         #outFile.cd()
         CSVRECOvspT1.Write()
-        outFile.Close()
-
-        #Create ROOT file
-	outFile =ROOT.TFile('CSV_HLT_vs_pT_jet2.root', 'recreate')
-        #outFile.cd()
-        CSVHLTvspT2.Write()
-        outFile.Close()
-
-        #Create ROOT file
-        outFile = ROOT.TFile('CSV_RECO_vs_pT_jet2.root', 'recreate')
-        outFile.cd()
-        CSVRECOvspT2.Write()
-        outFile.Close()
+#        outFile.Close()
   
         #Create ROOT file
-        outFile = ROOT.TFile('matching.root', 'recreate')
+#        outFile = ROOT.TFile('CSV_HLT_vs_eta_jet1.root', 'recreate')
+        #outFile.cd()
+        CSVHLTvseta1.Write()
+#        outFile.Close()
+
+        #Create ROOT file
+#        outFile = ROOT.TFile('CSV_RECO_vs_eta_jet1.root', 'recreate')
+        #outFile.cd()
+        CSVRECOvseta1.Write()
+#        outFile.Close()
+
+        #Create ROOT file
+#        outFile = ROOT.TFile('CSV_HLT_vs_eta_jet2.root', 'recreate')
+        #outFile.cd()
+        CSVHLTvseta2.Write()
+#        outFile.Close()
+
+        #Create ROOT file
+#        outFile = ROOT.TFile('CSV_RECO_vs_eta_jet2.root', 'recreate')
+        #outFile.cd()
+        CSVRECOvseta2.Write()
+#        outFile.Close()
+
+
+        #Create ROOT file
+#	outFile =ROOT.TFile('CSV_HLT_vs_pT_jet2.root', 'recreate')
+        #outFile.cd()
+        CSVHLTvspT2.Write()
+#        outFile.Close()
+
+        #Create ROOT file
+#        outFile = ROOT.TFile('CSV_RECO_vs_pT_jet2.root', 'recreate')
+        outFile.cd()
+        CSVRECOvspT2.Write()
+#        outFile.Close()
+  
+        #Create ROOT file
+#        outFile = ROOT.TFile('matching.root', 'recreate')
         outFile.cd()
         histogram.Write()
+
+        first_range_jet1.Write()
+        second_range_jet1.Write()
+        third_range_jet1.Write()
+        fourth_range_jet1.Write()
+        first_range_jet2.Write()
+        second_range_jet2.Write()
+        third_range_jet2.Write()
+        fourth_range_jet2.Write()
+
+        first_range_jet1_reco.Write()
+        second_range_jet1_reco.Write()
+        third_range_jet1_reco.Write()
+        fourth_range_jet1_reco.Write()
+        first_range_jet2_reco.Write()
+        second_range_jet2_reco.Write()
+        third_range_jet2_reco.Write()
+        fourth_range_jet2_reco.Write()
+
+
+
+
         outFile.Close()
