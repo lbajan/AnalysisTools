@@ -47,11 +47,15 @@ inputFile_QCD   = TFile.Open('output.root')
 
 
 # get 2D b-tag discriminator vs jet pT histograms
-discrVsPt_b_ttbar    = inputFile_ttbar.Get('eff_jet2')
-discrVsPt_b_QCD      = inputFile_QCD.Get('eff_reco_jet2')
+discrVsPt_b_ttbar    = inputFile_ttbar.Get('firs_range_jet2')
+discrVsPt_b_QCD      = inputFile_QCD.Get('firs_range_jet2')
+discrVsPt_b_ttbar_add    = inputFile_ttbar.Get('fourth_range_jet2')
+discrVsPt_b_QCD_add      = inputFile_QCD.Get('fourth_range_jet2_reco')
 #discrVsPt_udsg_ttbar = inputFile_ttbar.Get('id9')
 #discrVsPt_udsg_QCD   = inputFile_QCD.Get('bTaggingExerciseII/' + bTagger + '_udsg')
 
+discrVsPt_b_ttbar.Add(discrVsPt_b_ttbar_add)
+discrVsPt_b_QCD.Add(discrVsPt_b_QCD_add)
 
 # make x-axis projections to get 1D distributions of the total number of b and light-flavor (udsg) jets
 total_b_ttbar    = copy.deepcopy(discrVsPt_b_ttbar.ProjectionX("_px1"))
@@ -83,7 +87,7 @@ eff_b_ttbar = TGraphAsymmErrors(tagged_b_ttbar, total_b_ttbar, "cp")
 eff_b_ttbar.GetXaxis().SetTitle("Jet pT [GeV]")
 eff_b_ttbar.GetYaxis().SetTitle("b-tagging efficiency")
 eff_b_ttbar.GetXaxis().SetRangeUser(0,900)
-eff_b_ttbar.GetYaxis().SetRangeUser(0.,0.4)
+eff_b_ttbar.GetYaxis().SetRangeUser(0.,0.6)
 eff_b_ttbar.SetLineWidth(2)
 eff_b_ttbar.SetLineColor(kRed)
 eff_b_ttbar.SetMarkerColor(kRed)
@@ -97,6 +101,17 @@ eff_b_QCD.SetMarkerColor(kBlack)
 eff_b_QCD.SetMarkerStyle(21)
 eff_b_QCD.Draw('p')
 
+
+l1 = TLatex()
+l1.SetTextAlign(12)
+l1.SetTextFont(42)
+l1.SetNDC()
+l1.SetTextSize(0.04)
+l1.SetTextSize(0.04)
+l1.DrawLatex(0.60,0.80, "1.2 < |#eta| < 2.4")
+#l1.DrawLatex(0.18,0.32, "#intLdt = 1 fb^{-1}")
+#l1.DrawLatex(0.19,0.27, "#sqrt{s} = 13 TeV")
+
 legend = TLegend(.20,.70,.30,.90)
 legend.SetBorderSize(0)
 legend.SetFillColor(0)
@@ -108,9 +123,9 @@ legend.AddEntry(eff_b_QCD,"RECO","lp")
 legend.Draw()
 
 # save the plot
-if options.operating_point == 'loose': c.SaveAs('bTaggingEfficiency_pfCSVv2IVFL.pdf')
+if options.operating_point == 'loose': c.SaveAs('bTaggingEfficiency_range1_jet2_loose.pdf')
 elif options.operating_point == 'tight': c.SaveAs('bTaggingEfficiency_pfCSVv2IVFT.pdf')
-else: c.SaveAs('bTaggingEfficiency_pfCSVv2IVFM_JET2.pdf')
+else: c.SaveAs('bTaggingEfficiency_range2_jet2.pdf')
 
 
 

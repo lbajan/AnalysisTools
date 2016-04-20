@@ -91,10 +91,13 @@ if __name__== '__main__':
                     print '---> Event ' + str(i)
                     print 'Selected events:', k 
                     print 'Run:', tree.run
+                
              
                 if not tree.passHLT_HT450 >0: 
                     continue 
-                #applie cuts on pT, eta, delta eta and mjj
+                if not tree.PassJSON > 0:
+                    continue 
+               # applie cuts on pT, eta, delta eta and mjj
                 if not tree.pTAK4_j1 > 60 :
                    continue
                 if not tree.pTAK4_j2 > 30 :
