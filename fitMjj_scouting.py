@@ -7,17 +7,17 @@ from ROOT import *
 import CMS_lumi, setTDRStyle
 
 gROOT.SetBatch(kTRUE)
+
 # configuration
 readExistingHisto=1
 #inputHistoFileName="Data_and_ResonanceShapes/rawhistV7_Run2015D_scoutingPFHT_UNBLINDED_649_838_JEC_HLTplusV7_Mjj_cor_smooth.root"
 inputHistoFileName="histos_mjj.root"
-inputEfficiencyFileName="triggerEfficiency_L1HTT150seed_HT450_DetaJJLess1p3_HLTv7Corr_output.root"
 inputDataFileName = "/t3/users/santanas/Dijet13TeVScouting/rootTrees_reduced/ScoutingPFHT__15_01_2016_20160115_192039/merged/rootfile_ScoutingPFHT__Run2015D-v1__RAW_ScoutingPFHT__15_01_2016_20160115_192039_reduced_skim.root"
 treeName = "rootTupleTree/tree"
 outputLabel = "output"
 var = "mjj"
 sqrtS = 13000.
-lumiValue = 1806 #[pb]
+lumiValue = 1866 #[pb]
 showCrossSection = 1 #1=cross section [pb] , 0=number of events/GeV
 #drawSignalShapeAlsoAlone = 1
 fixedRange = 1 #1=YES , 0=NO  (the option works only if showCrossSection=1; otherwise=0)
@@ -29,8 +29,6 @@ else:
     lumi = 1
 massMin = 838
 massMax = 2037
-efficiency_massMin = 450
-efficiency_massMax = 900
 blindRegionMassMin = 0
 #blindRegionMassMin = 649
 blindRegionMassMax = 0
@@ -39,7 +37,6 @@ doBlind = False
 if blindRegionMassMin != blindRegionMassMax:
     doBlind = True
 xaxisTitle = "Dijet Mass [GeV]"
-doSimultaneousFit = False
 if showCrossSection==1:
     yaxisTitle_main = "d#sigma / dm_{jj}   [pb / GeV]"
 else:
@@ -87,7 +84,7 @@ setTDRStyle.setTDRStyle()
 #change the CMS_lumi variables (see CMS_lumi.py)
 CMS_lumi.lumi_7TeV = "%1.f fb^{-1}" % lumiValue
 CMS_lumi.lumi_8TeV = "%1.f fb^{-1}" % lumiValue
-CMS_lumi.lumi_13TeV = "%.1f fb^{-1}" % (lumiValue/1000.0)
+CMS_lumi.lumi_13TeV = "%1.f pb^{-1}" % lumiValue
 CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "Preliminary"
 CMS_lumi.lumi_sqrtS = "13 TeV" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
@@ -121,20 +118,16 @@ def main():
         inputDataFile = TFile(inputDataFileName)
         treeData = inputDataFile.Get(treeName)
         print "number of entries in the data tree: ", treeData.GetEntries()
-    inputEfficiencyFile = TFile(inputEfficiencyFileName)
 
     # mass variable
-    mjj = RooRealVar('mjj', 'mjj', min(float(massMin), float(efficiency_massMin)),
-                     max(float(massMax), float(efficiency_massMax)))
-    mjj.setRange("MassFit", massMin, massMax)
-    mjj.setRange("EfficiencyFit", efficiency_massMin, efficiency_massMax)
+    mjj = RooRealVar('mjj', 'mjj', float(massMin), float(massMax))
     mjj.setRange("RangeLow", massMin, blindRegionMassMin)
     mjj.setRange("RangeHigh", blindRegionMassMax, massMax)
 
     # data
     dataInt = 1
     if (readExistingHisto==1):
-        h_data = (inputDataFile.Get("mjj_btag2_loose")).Clone("h_data")
+        h_data = (inputDataFile.Get("mjj_btag2_medium")).Clone("h_data")
         if doBlind:
             dataInt = h_data.Integral(massMin + 1, blindRegionMassMin) + h_data.Integral(blindRegionMassMax + 1, massMax)
         else:
@@ -144,54 +137,28 @@ def main():
         treeData.Project("h_data",var,sel);
         dataInt = h_data.GetEntries()
     print "number of events in the fit range:", int(dataInt)
-    efficiency = inputEfficiencyFile.Get("efficiency")
 
     h_data_roo = RooDataHist('h_data_roo', 'h_data_roo', RooArgList(mjj), h_data)
     h_data_roo.Print()
 
-    # Fill trigger efficiency dataset
-    h_passed = efficiency.GetPassedHistogram()
-    h_total = efficiency.GetTotalHistogram()
-    cut = RooCategory("cut", "cutr")
-    cut.defineType("pass", 1)
-    cut.defineType("fail", 0)
-    trigger_data = RooDataSet("trigger_data", "trigger data", RooArgSet(mjj, cut))
-    for i in range(efficiency_massMin+1, efficiency_massMax+1):
-        mjj.setVal(h_total.GetXaxis().GetBinCenter(i))
-        if h_passed.GetBinContent(i) > 0:
-            cut.setLabel("pass")
-            weight = h_passed.GetBinContent(i)
-            for j in range(int(weight)):
-                trigger_data.add(RooArgSet(mjj, cut))
-        if h_total.GetBinContent(i) > h_passed.GetBinContent(i):
-            cut.setLabel("fail")
-            weight = h_total.GetBinContent(i) - h_passed.GetBinContent(i)
-            for j in range(int(weight)):
-                trigger_data.add(RooArgSet(mjj, cut))
-    trigger_data.Print("v")
-
-    # trigger efficiency model
+#    # trigger efficiency model
     m_eff = RooRealVar('m_eff','m_eff',495.7,450.,550.)
     sigma_eff = RooRealVar('sigma_eff','sigma_eff',96.0,80.,120.)
-    effFunc = RooFormulaVar("effFunc", "0.5*(1.0 + TMath::Erf((mjj - m_eff)/sigma_eff))", RooArgList(mjj, m_eff, sigma_eff))
-#    efficiency = RooGenericPdf('efficiency','(1/2)* ( 1 + TMath::Erf((@0-@1)/@2))',RooArgList(mjj,m_eff,sigma_eff))
+    m_eff.setConstant(kTRUE)
+    sigma_eff.setConstant(kTRUE)
+#    efficiency = RooGenericPdf('efficiency','(1/2)* ( 1 + TMath::Erf((@0-@1)/@2))',RooArgList(mjj,m_eff,sigma_eff))    
 #    efficiency.Print()
-    effPdf = RooEfficiency("effPdf", "effPdf", effFunc, cut, "pass")
-    if not doSimultaneousFit:
-        effPdf.fitTo(trigger_data)
-        effPdf.Print()
-        m_eff.setConstant(kTRUE)
-        sigma_eff.setConstant(kTRUE)
 
     #old
     # background model
     norm = RooRealVar('norm', 'norm', dataInt, 0.0, 1.0e9)
-    p1 = RooRealVar('p1', 'p1', 11.52, 0.0, 100.0)
-    p2 = RooRealVar('p2', 'p2', 7.5, 0.0, 0.60)
-    p3 = RooRealVar('p3', 'p3', 0.68, -10.0, 10.0)
+    p1 = RooRealVar('p1', 'p1', 42.76 , 0, 100.0)
+    p2 = RooRealVar('p2', 'p2', -7.30, -60.0, 60.0)
+    p3 = RooRealVar('p3', 'p3', -1.79, -10.0, 10.0)
+    #p3.setConstant
     background = RooGenericPdf('background','(pow(1-@0/%.1f,@1)/pow(@0/%.1f,@2+@3*log(@0/%.1f)))'%(sqrtS,sqrtS,sqrtS),RooArgList(mjj,p1,p2,p3))
     background.Print()
-    background_ext = RooAddPdf("background_ext","",RooArgList(background),RooArgList(norm))
+    background_ext = RooAddPdf("model","b-only",RooArgList(background),RooArgList(norm))
 
     #new
     # background model
@@ -210,32 +177,13 @@ def main():
     #                              RooFit.Extended(kTRUE), RooFit.Save(kTRUE),
     #                              RooFit.Strategy(1))
     if doBlind:
-        # res_b = background_ext.fitTo(h_data_roo, RooFit.Range("RangeLow,RangeHigh"),
-        #                              RooFit.Extended(kTRUE), RooFit.Save(kTRUE),
-        #                              RooFit.Strategy(1))
-        nll_mass = background_ext.createNLL(h_data_roo, RooFit.Range("RangeLow,RangeHigh"),
-                                         RooFit.Extended(kTRUE), RooFit.Save(kTRUE),
-                                         RooFit.Strategy(1))
+        res_b = background_ext.fitTo(h_data_roo, RooFit.Range("RangeLow,RangeHigh"),
+                                     RooFit.Extended(kTRUE), RooFit.Save(kTRUE),
+                                     RooFit.Strategy(1))
     else:
-         res_b = background_ext.fitTo(h_data_roo, RooFit.Range("MassFit"),
-                                      RooFit.Extended(kTRUE), RooFit.Save(kTRUE),
-                                      RooFit.Strategy(1))
-#        nll_mass = background_ext.createNLL(h_data_roo, RooFit.Range("MassFit"),
-#                                            RooFit.Extended(kTRUE), RooFit.Save(kTRUE),
-#                                            RooFit.Strategy(1))
-
-    if doSimultaneousFit:
-        nll_efficiency = effPdf.createNLL(trigger_data)
-        nll_simultaneous = RooAddition("nll_simultaneous", "simultaneous nll",
-                                       RooArgList(nll_mass, nll_efficiency))
-        res_b = RooMinuit(nll_simultaneous)
-        res_b.migrad()
-        res_b.simplex()
-    else:
-#        res_b = RooMinuit(nll_mass)
-#        res_b.migrad()
-        #res_b.simplex()
-         res_b.Print()
+        res_b = background_ext.fitTo(h_data_roo, RooFit.Extended(kTRUE),
+                                     RooFit.Save(kTRUE), RooFit.Strategy(1))
+    res_b.Print()
 
     # Try roosimultaneous fit
 
@@ -249,7 +197,7 @@ def main():
     #res_b.Print()
 
     # fit results
-    norm_b = norm#res_b.floatParsFinal().find("norm") #normalization in extended LL
+    norm_b = res_b.floatParsFinal().find("norm") #normalization in extended LL
     #norm_b = RooRealVar('norm_b','norm_b',dataInt,0.,1e+09) #normalization without extended LL
     # p1_b = res_b.floatParsFinal().find("p1")
     # p2_b = res_b.floatParsFinal().find("p2")
@@ -258,7 +206,7 @@ def main():
     p2_b = p2
     p3_b = p3
 
-    background_noNorm = TF1("background_noNorm","( TMath::Power(1-x/%.1f,[0]) ) / ( TMath::Power(x/%.1f,[1]+[2]*log(x/%.1f)) )*(0.5*(1.0 + TMath::Erf((x - [3])/[4])))"%(sqrtS,sqrtS,sqrtS),float(massMin),float(massMax))
+    background_noNorm = TF1("background_noNorm","( TMath::Power(1-x/%.1f,[0]) ) / ( TMath::Power(x/%.1f,[1]+[2]*log(x/%.1f)) )"%(sqrtS,sqrtS,sqrtS),float(massMin),float(massMax))
     background_noNorm.SetParameter(0,p1_b.getVal())
     background_noNorm.SetParameter(1,p2_b.getVal())
     background_noNorm.SetParameter(2,p3_b.getVal())
@@ -281,7 +229,7 @@ def main():
     print "m_eff =", m_eff.getVal()
     print "sigma_eff =", sigma_eff.getVal()
 
-    background = TF1("background","( [0]*TMath::Power(1-x/%.1f,[1]) ) / ( TMath::Power(x/%.1f,[2]+[3]*log(x/%.1f)) )*(0.5*(1.0 + TMath::Erf((x - [4])/[5])))"%(sqrtS,sqrtS,sqrtS),float(massMin),float(massMax))
+    background = TF1("background","( [0]*TMath::Power(1-x/%.1f,[1]) ) / ( TMath::Power(x/%.1f,[2]+[3]*log(x/%.1f)) )"%(sqrtS,sqrtS,sqrtS),float(massMin),float(massMax))
     background.SetParameter(0,p0_b)
     background.SetParameter(1,p1_b.getVal())
     background.SetParameter(2,p2_b.getVal())
@@ -650,8 +598,10 @@ def drawAndSavePlot_background(data_obs_TGraph_,background_TH1_,hist_fit_residua
     #============
 
     #write canvas
-    canvas.SaveAs(outputLabel_+"_B"+".root")
-    canvas.SaveAs(outputLabel_+"_B"+".pdf")
+    canvas.SaveAs(outputLabel_+"_B"+'_btag2_medium'+".root")
+    canvas.SaveAs(outputLabel_+"_B"+'btag2_medium'+".pdf")
+#    canvas.SaveAs(outputLabel_+"_B"+".root")
+#    canvas.SaveAs(outputLabel_+"_B"+".pdf")
 
     #raw_input("Press Enter to exit...")
 
